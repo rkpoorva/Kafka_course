@@ -1,0 +1,101 @@
+How to Create a Kafka Producer in Java?
+
+There are four steps to create a Java producer:
+
+Create a Java Class ProducerDemo.java
+
+Create producer properties
+
+Create the producer
+
+Create a producer record
+
+Send the data
+
+1. Add a private static final variable of logger:-
+
+      import org.slf4j.Logger;
+      import org.slf4j.LoggerFactory;
+      public class ProducerDemo {
+      private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class);
+
+      public static void main(String[] args) {
+            log.info("I am a Kafka Producer");
+       }
+      }
+
+
+2. Create producer properties (configuration of Producers):-
+
+        Properties properties = new Properties();
+        properties.setProperty("key","value");  //setting every property with key and value pair
+
+Apache Kafka offers various Kafka Properties which are used for creating a producer.
+To know about each property, visit the official site of Kafka - https://kafka.apache.org/documentation.
+Navigate to Kafka > Documentation > Configurations > Producer Configs.
+
+* Connecting to local host server---
+  properties.setProperty("bootstrap.server", "127.0.0.1:8080");
+                    OR
+  properties.setProperty("bootstrap.servers", "localhost:8080");
+                    OR
+  String bootstrapServers = "127.0.0.1:8080";
+  properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+
+bootstrap.servers: It is a list of the port pairs which are used for establishing an initial connection to the Kafka cluster.
+ We use the bootstrap servers for making an initial connection to the cluster.
+ This server is present in the host:port, host:port,... form.
+
+
+* how to connect to remote server
+  properties.setProperty("security.protocol","SASL_SSL");
+  properties.setProperty("sasl.jaas.config","org.apache.kafka.common.security.plain.PlainLoginModule required username=\" \" password=\" \";);
+  properties.setProperty("sasl.mechanism","PLAIN");
+
+
+* set producer properties in order to specify how producer is going to behave---
+  properties.setProperty("key.serializer", StringSerializer.class.getName());
+  properties.setProperty("value.serializer", "StringSerializer.class.getName()");
+  properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+  properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+
+key.serializer: It is a type of Serializer class of the key that is used to implement the org.apache.kafka.common.serialization.Serializer interface.
+
+value.serializer: It is a type of Serializer class which implements the org.apache.kafka.common.serialization.Serializer interface.
+
+StringSerializer.class.getName() - means that our producer is expecting strings which will be serialized in bytes by key.serializer
+and value.serializer using StringSerializer class provided by kafka client
+
+
+3. Create the Kafka producer:-
+To create a Kafka producer, we just need to create an object of KafkaProducer. The object of KafkaProducer can be created as:
+
+        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+
+
+4. Create a producer record:-
+In order to send the data to Kafka, we need to create a ProducerRecord.
+ Here, the producer specifies the topic name as well as the message value which is to be delivered to Kafka.
+ The key is assumed to be null in this instance.
+
+        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("first_topic", "hello world");
+
+
+5. Send the data:-
+        producer.send(producerRecord); ---- asynchronous
+
+
+6. Tell producer to send all data and clock until done:-
+        producer.flush(); ---- synchronous
+
+
+7. flush and close producer
+        producer.close();
+
+Now, we are ready to send the data to Kafka.
+The producer just needs to invoke the object of the ProducerRecord.
+The data produced by a producer is asynchronous.
+Therefore, two additional functions, i.e., flush() and close() are required to ensure the producer is shut down
+after the message is sent to Kafka.
+The flush() will force all the data that was in .send() to be produced and close() stops the producer.
+If these functions are not executed, the data will never be sent to Kafka as the main Java thread will exit before the data are flushed.
