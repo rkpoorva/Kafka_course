@@ -10,7 +10,8 @@ import java.util.Properties;
 public class Producer {
 
     private static final Logger log = LoggerFactory.getLogger(Producer.class.getSimpleName());
-    public static void main(String[] args) {
+    public static void main(
+            String[] args) {
         log.info("hello");
 
         //create Producer properties
@@ -45,13 +46,6 @@ public class Producer {
 }
 
 
-        // Create Kafka producer instance with the configured properties
-        //KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        // Use the producer to send messages to Kafka topics
-        // producer.send(new ProducerRecord<>("my-topic", "key", "value"));
-
-        // Close the producer when done
-        //producer.close();
 
 
