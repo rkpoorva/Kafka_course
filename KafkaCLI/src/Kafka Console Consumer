@@ -1,0 +1,182 @@
+Consumer will read the topic from producer
+
+Consume from tail of the topic
+Consume from the beginning of the topic
+Show both key and values in the output
+
+
+kafka-console-consumer.sh
+This tool helps to read data from Kafka topics and outputs it to standard output.
+Option                                                    Description
+------                                                    -----------
+--bootstrap-server <String: server to  connect to>      REQUIRED: The server(s) to connect to.
+
+--consumer-property <String: consumer_prop>             A mechanism to pass user-defined properties in the form key=value to the consumer.
+
+--consumer.config <String: config file>                 Consumer config properties file. Note that [consumer-property] takes precedence over this config.
+
+--enable-systest-events                  Log lifecycle events of the consumer
+                                          in addition to logging consumed
+                                           messages. (This is specific for
+                                           system tests.)
+--formatter <String: class>              The name of a class to use for
+                                           formatting kafka messages for
+                                           display. (default: kafka.tools.
+                                           DefaultMessageFormatter)
+--formatter-config <String: config       Config properties file to initialize
+  file>                                    the message formatter. Note that
+                                           [property] takes precedence over
+                                           this config.
+--from-beginning                         If the consumer does not already have
+                                           an established offset to consume
+                                           from, start with the earliest
+                                           message present in the log rather
+                                           than the latest message.
+--group <String: consumer group id>      The consumer group id of the consumer.
+--help                                   Print usage information.
+--include <String: Java regex (String)>  Regular expression specifying list of
+                                           topics to include for consumption.
+--isolation-level <String>               Set to read_committed in order to
+                                           filter out transactional messages
+                                           which are not committed. Set to
+                                           read_uncommitted to read all
+                                           messages. (default: read_uncommitted)
+--key-deserializer <String:
+  deserializer for key>
+--max-messages <Integer: num_messages>   The maximum number of messages to
+                                           consume before exiting. If not set,
+                                           consumption is continual.
+--offset <String: consume offset>        The offset to consume from (a non-
+                                           negative number), or 'earliest'
+                                           which means from beginning, or
+                                           'latest' which means from end
+                                           (default: latest)
+--partition <Integer: partition>         The partition to consume from.
+                                           Consumption starts from the end of
+                                           the partition unless '--offset' is
+                                           specified.
+--property <String: prop>                The properties to initialize the
+                                           message formatter. Default
+                                           properties include:
+                                          print.timestamp=true|false
+                                          print.key=true|false
+                                          print.offset=true|false
+                                          print.partition=true|false
+                                          print.headers=true|false
+                                          print.value=true|false
+                                          key.separator=<key.separator>
+                                          line.separator=<line.separator>
+                                          headers.separator=<line.separator>
+                                          null.literal=<null.literal>
+                                          key.deserializer=<key.deserializer>
+                                          value.deserializer=<value.
+                                           deserializer>
+                                          header.deserializer=<header.
+                                           deserializer>
+                                         Users can also pass in customized
+                                           properties for their formatter; more
+                                           specifically, users can pass in
+                                           properties keyed with 'key.
+                                           deserializer.', 'value.
+                                           deserializer.' and 'headers.
+                                           deserializer.' prefixes to configure
+                                           their deserializers.
+--skip-message-on-error                  If there is an error when processing a
+                                           message, skip it instead of halt.
+--timeout-ms <Integer: timeout_ms>       If specified, exit if no message is
+                                           available for consumption for the
+                                           specified interval.
+--topic <String: topic>                  The topic to consume on.
+--value-deserializer <String:
+  deserializer for values>
+--version                                Display Kafka version.
+--whitelist <String: Java regex          DEPRECATED, use --include instead;
+  (String)>                                ignored if --include specified.
+                                           Regular expression specifying list
+                                           of topics to include for consumption.
+
+
+# create a topic with 3 partitions
+kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --create --partitions 3
+// WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+   Created topic second_topic.
+
+# consuming
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic second_topic
+//hello world
+  my name is poorva
+  its working
+  one
+  5
+  //in whatever order we will produce the messages in that same order only the messages will be consumed
+
+# other terminal
+kafka-console-producer.sh --bootstrap-server localhost:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic second_topic
+//hello world
+  my name is poorva
+  its working
+  one
+  5
+  //in whatever order we will produce the messages in that same order only the messages will be consumed
+  //So number one, we produce to the second topic, the topic we just created.
+    And number two, we pass in a producer property called the "partitioner" class and this is called a "RoundRobinPartitioner".
+    The reason of using this round robin partitioner is because we want to produce to one partition at a time, change every partition.
+    If you do not use this round robin partitioner,
+    There have been so many optimizations built in into Kafka right now that you will keep on producing to the same partition up until we send about 16 kilobytes of data,
+    Then will switch partition, which is very difficult to demonstrate as a teaching mechanism but is great for production settings.
+
+    But because we are learning Kafka and I want to show you what happens when you produce to multiple partitions, I'm going to be using this round robin partitioner.
+
+# consuming from beginning
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic second_topic --from-beginning
+hello world
+one
+its working
+my name is poorva
+//the reason the above messages/output is not in order because second_topic has 3 partitions
+
+
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+Helloo world
+my name is poorva pasrija
+message is acknowleged
+fun learning kafka
+example value
+poorva
+//the reason the above messages/output is in order because first_topic has only 1 partition
+
+# display key, values and timestamp in consumer
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic second_topic --formatter kafka.tools.DefaultMessageFormatter
+  --property print.timestamp=true
+  --property print.key=true
+  --property print.value=true
+  --property print.partition=true
+  --from-beginning
+
+//CreateTime:1718185260037	Partition:1	null	hello world
+  CreateTime:1718185288507	Partition:1	null	one
+  CreateTime:1718185803083	Partition:1	null	Hiiii
+  CreateTime:1718185276660	Partition:0	null	its working
+  CreateTime:1718185269485	Partition:2	null	my name is poorva
+  CreateTime:1718185292734	Partition:2	null	5
+  CreateTime:1718185816153	Partition:2	null	whats up
+
+//We get ordering per partition
+
+CreateTime:1718185260037	Partition:1	null	hello world
+CreateTime:1718185288507	Partition:1	null	one
+CreateTime:1718185803083	Partition:1	null	Hiiii
+CreateTime:1718185276660	Partition:0	null	its working
+CreateTime:1718185269485	Partition:2	null	my name is poorva
+CreateTime:1718185292734	Partition:2	null	5
+CreateTime:1718185816153	Partition:2	null	whats up
+CreateTime:1718190085007	Partition:0	null	where are you
+CreateTime:1718190097518	Partition:1	null	home
+CreateTime:1718190112875	Partition:2	null	poorva
+CreateTime:1718190116628	Partition:0	null	pasrija
+CreateTime:1718190149507	Partition:1	null	seven
+CreateTime:1718190158285	Partition:2	null	eightlyyyyy
+
+
+//In Kafka if we want to scale, therefore we need multiple partitions and the producer will produce to different partitions.
+  And we will consume from different partitions with different consumers at the same time

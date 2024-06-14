@@ -1,0 +1,93 @@
+Learn about --group parameter
+
+See how partitions read are divided amongst multiple CLI consumers
+
+
+# create a topic with 3 partitions
+kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3
+//Created topic third_topic
+
+# start first consumer
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic third_topic --group my-first-application
+//test
+
+  How
+  are
+  doing?
+  Poorva
+
+# start one producer and start producing
+kafka-console-producer.sh --bootstrap-server localhost:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic third_topic
+>test
+
+>Hii
+>How
+>are
+>you
+>doing?
+>Poorva
+>Pasrija
+
+
+# start second consumer part of the same group. See messages being spread
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic third_topic --group my-first-application
+//Hii
+  you
+  Pasrija
+
+//we have now two consumers in the same group that is my-first-application
+as we see above that second consumer has 1 partition and first consumer has 2 partitions, so they are consuming messages accordingly
+
+
+# start third consumer part of the same group.
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic third_topic --group my-first-application
+//One
+  4
+  seven
+  10
+
+now start producing:-
+kafka-console-producer.sh --bootstrap-server localhost:9092 --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic third_topic
+>One
+>two
+>three
+>4
+>5
+>6
+>seven
+>eight
+>nine
+>10
+
+First consumer :-          Second Consumer :-              Third Consumer :-
+three                       two                              One
+6                           5                                4
+nine                        eight                            seven
+                                                             10
+
+// as we can see that the messages get spread all across the consumers
+//now we have a producer producing to different partitions and consumer consuming from different partitions
+
+
+# start another consumer part of a different group from beginning
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic third_topic --group my-second-application --from-beginning
+//are
+  Poorva
+  One
+  4
+  seven
+  10
+  how
+  doing
+  three
+  6
+  nine
+  hii
+  you
+  Pasrija
+  two
+  5
+  eight
+
+//if we start consumer of same topic from beginning but the group is different, then it will read all the messages in the particular topic
+if we execute the same above command, then there will be no output
