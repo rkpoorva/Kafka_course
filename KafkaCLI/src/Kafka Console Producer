@@ -151,7 +151,7 @@ kafka-console-producer.sh --bootstrap-server localhost:9092 --topic new_topic
 # our new topic only has 1 partition
 kafka-topics.sh --bootstrap-server localhost:9092 --list
 //first_topic
-  new_topic     //new_topic is automatically created
+  new_topic     //new_topic is automatically created by default by kafka and it will have 1 partition and 1 replication factor initially
 
 kafka-topics.sh --bootstrap-server localhost:9092 --topic new_topic --describe
 //Topic: new_topic	TopicId: v7B07COVS3iiR0clUu3sDA	PartitionCount: 1	ReplicationFactor: 1	Configs:

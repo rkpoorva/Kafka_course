@@ -33,6 +33,14 @@ my-second-application third_topic     1          5               9              
 my-second-application third_topic     2          8               11              3               -               -               -
 
 
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-second-application
+
+GROUP                 TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                           HOST            CLIENT-ID
+my-second-application third_topic     0          13              13              0               console-consumer-1816d347-83f6-4888-bb22-1fa7e1af23e6 /127.0.0.1      console-consumer
+my-second-application third_topic     1          12              12              0               console-consumer-1816d347-83f6-4888-bb22-1fa7e1af23e6 /127.0.0.1      console-consumer
+my-second-application third_topic     2          15              15              0               console-consumer-1816d347-83f6-4888-bb22-1fa7e1af23e6 /127.0.0.1      console-consumer
+
+
 # describe another group
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-application
 

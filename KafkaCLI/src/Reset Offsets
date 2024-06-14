@@ -1,0 +1,112 @@
+Reset Offsets using Kafka consumer group's command
+
+Consumers read from a consumer group and then they commit offsets once in while which allows them to restart the reads from where the offset was last committed
+
+start consumer
+stop consumer
+reset the offsets
+again start the consumer
+see the result
+
+
+# look at the documentation again
+kafka-consumer-groups.sh
+
+# describe the consumer group
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-application
+
+//Consumer group 'my-first-application' has no active members.
+  GROUP                TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+  my-first-application third_topic     0          6               13              7               -               -               -
+  my-first-application third_topic     1          5               12              7               -               -               -
+  my-first-application third_topic     2          7               15              8               -               -               -
+
+# Dry Run: reset the offsets to the beginning of each partition
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --dry-run
+
+//GROUP                          TOPIC                          PARTITION  NEW-OFFSET
+  my-first-application           third_topic                    0          0
+  my-first-application           third_topic                    1          0
+  my-first-application           third_topic                    2          0
+
+# execute flag is needed
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest --topic third_topic --execute
+
+//GROUP                          TOPIC                          PARTITION  NEW-OFFSET
+  my-first-application           third_topic                    0          0
+  my-first-application           third_topic                    1          0
+  my-first-application           third_topic                    2          0
+
+# describe the consumer group again
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-application
+
+//Consumer group 'my-first-application' has no active members.
+
+  GROUP                TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+  my-first-application third_topic     0          0               13              13              -               -               -
+  my-first-application third_topic     1          0               12              12              -               -               -
+  my-first-application third_topic     2          0               15              15              -               -               -
+
+# consume from where the offsets have been reset
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic third_topic --group my-first-application
+//hii
+  are
+  Poorva
+  One
+  4
+  seven
+  10
+  kafka
+  u
+  o
+  da
+  1
+  4
+  name
+  pasrija
+  how
+  doing
+  three
+  6
+  nine
+  a
+  i
+  dad
+  cs
+  3
+  my
+  poorva
+  hii
+  you
+  Pasrija
+  two
+  5
+  eight
+  love
+  e
+  z
+  df
+  2
+  5
+  is
+
+# describe the group again
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-application
+
+//Consumer group 'my-first-application' has no active members.
+
+  GROUP                TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+  my-first-application third_topic     0          13              13              0               -               -               -
+  my-first-application third_topic     1          12              12              0               -               -               -
+  my-first-application third_topic     2          15              15              0               -               -               -
+
+  //now the lag is zero
+  //reset cant happen when consumer is running. So the consumer must be off and no consumers is part of group to reset the offsets.
+
+
+#look at the documentation again for more understanding
+ kafka-consumer-groups.sh
+
+
+
+

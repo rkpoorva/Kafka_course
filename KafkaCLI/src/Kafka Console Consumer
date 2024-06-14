@@ -180,3 +180,5 @@ CreateTime:1718190158285	Partition:2	null	eightlyyyyy
 
 //In Kafka if we want to scale, therefore we need multiple partitions and the producer will produce to different partitions.
   And we will consume from different partitions with different consumers at the same time
+
+#TO overide the group.id for kafka-console-consumer use --group mygroup
