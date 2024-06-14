@@ -1,0 +1,64 @@
+We have to download kafka binary version
+
+Connect to Kafka :----
+cd Downloads
+cd Kafka_2.13-3.7.0
+bin/kafka-topics.sh
+
+Either we put full path in terminal for Kafka CLI to execute like above
+or set the path in environment variables, then we can execute the commands in terminal with only kafka-topics.sh
+if we have setup the path variable, then we should be able to invoke the CLI from anywhere on our computer
+
+Kafka Topic Management:-
+1. create kafka topic
+2. list kafka topic
+3. describe kafka topic
+4. increase partitions in a kafka topic
+5. delete a kafka topic
+
+
+kafka-topics.sh
+
+kafka-topics.sh --bootstrap-server localhost:9092
+//Command must include exactly one action: --list, --describe, --create, --alter or --delete
+
+kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create
+//Created topic first_topic.
+
+kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --create --partitions 3
+//Created topic second_topic.
+
+kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 2
+//Error while executing topic command : Replication factor: 2 larger than available brokers: 1.
+[2024-06-11 15:14:15,253] ERROR org.apache.kafka.common.errors.InvalidReplicationFactorException: Replication factor: 2 larger than available brokers: 1.
+
+# Create a topic (working)
+kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --create --partitions 3 --replication-factor 1
+//Created topic third_topic.
+
+# List topics
+kafka-topics.sh --bootstrap-server localhost:9092 --list
+//first_topic
+  second_topic
+  third_topic
+
+# Describe a topic
+kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --describe
+//Topic: second_topic	TopicId: bLzkydgVSrGILF6Jjx4VzA	PartitionCount: 3	ReplicationFactor: 1	Configs:
+  	Topic: second_topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+  	Topic: second_topic	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
+  	Topic: second_topic	Partition: 2	Leader: 0	Replicas: 0	Isr: 0
+
+//kafka-topics.sh --bootstrap-server localhost:9092 --topic third_topic --describe
+Topic: third_topic	TopicId: i1y2AnK0Sker9Cc1gVP5uA	PartitionCount: 3	ReplicationFactor: 1	Configs:
+	Topic: third_topic	Partition: 0	Leader: 0	Replicas: 0	Isr: 0
+	Topic: third_topic	Partition: 1	Leader: 0	Replicas: 0	Isr: 0
+	Topic: third_topic	Partition: 2	Leader: 0	Replicas: 0	Isr: 0
+
+
+# Delete a topic
+kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --delete
+# (only works if delete.topic.enable=true)
+After this you can run the --list command in order to check whether the topic is deleted or not
