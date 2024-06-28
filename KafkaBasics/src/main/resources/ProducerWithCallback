@@ -1,0 +1,53 @@
+Kafka Producer with Java API Callbacks
+
+    from the producer itself to which partition and offset the message was sent to and for this we will use callback interface
+    Confirm the partition and offset the message was sent to using Callbacks.
+
+    RoundRobin                      Sticky Partitioner(performance improvement)
+
+    While sending the data with producer.send we can also provide a callback
+    with callback, we can have a new function called onCompletion that i can override.
+      public void onCompletion(RecordMetadata recordMetadata, Exception e)
+    This callback is going to be executed every time a record is successfully sent or an exception is thrown
+
+    When we run ProducerWithCallback.java class, will get output as below:-
+    [main] INFO ProducerWithCallback - Kafka producer with api callbacks
+    [kafka-producer-network-thread | producer-1] INFO ProducerWithCallback - Received new metadata
+    Topic: First_topic
+    Partition: 0
+    Offset: 10
+    Timestamp: 1719573388926
+
+    Now we want to produce multiple messages at a time in our topic using for loop
+      for(int i =0; i<10; i++)
+      so when we run the code, everytime it's always going to be the same partition no. for all these messages.
+      first time, its coming as partition 1
+      second time we run the code, partition changes to partition 0
+
+      this is due to what's called this StickyPartitioner.
+
+      RoundRobin - the producer sends data at RoundRobin, that means that the first message will go to partition 1, the second to partition 2,
+                   the third to partition 3, and so on.
+
+      Sticky Partitioner(performance improvement) - if we sent 6 messages very quickly, producer is smart enough to be batching these messages
+       into one batch just to make it more efficient.
+       so first three messages will go to the same batch in partition 1 and next three messages will go to partition 2 as one batch
+
+      Producer behaves with a UniformPartitioner
+      As we can see in kafka logs that it starts with [main] INFO org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: and contains
+      all the config values
+      partitioner.class = null -- this means it is using the default partitioner and this only applies when we don't specify a key
+
+      Now if we want to switch between different partitions,
+      1. we need to increase the no. of messages to be send
+         for(int i =0; i<30; i++)
+      2. we need to add small thread of 500 milliseconds that sleep in try catch block in between each produce of a batch
+         Thread.sleep(500)
+      3. add another for loop for switching
+         for(int j=0; j<10; j++)
+      Now after running the class, we can see in kafka logs that we are switching between partitions
+
+      properties.setProperty("batch.size", "400"); //we would never go for a smaller batch size in production,by Kafka default its 16 kB of batch size.
+
+      //this will make messages go to different partitions for each batch
+        properties.setProperty("partitioner.class", RoundRobinPartitioner.class.getName());

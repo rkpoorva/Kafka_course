@@ -13,18 +13,18 @@ public class Producer {
 
     private static final Logger log = LoggerFactory.getLogger(Producer.class.getSimpleName());
     public static void main(String[] args) {
-        log.info("hello");
+        log.info("hello world");
 
         //create Producer properties//
         Properties properties = new Properties();
         properties.setProperty("key","value");
 
         //connecting to local host server//
-        properties.setProperty("bootstrap.server", "127.0.0.1:8080");
+        properties.setProperty("bootstrap.server", "127.0.0.1:9092");
         //OR
-        properties.setProperty("bootstrap.servers", "localhost:8080");
+        properties.setProperty("bootstrap.servers", "localhost:9092");
         //OR
-        String bootstrapServers = "127.0.0.1:8080";
+        String bootstrapServers = "127.0.0.1:9092";
         properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         //how to connect to remote server//
@@ -47,9 +47,13 @@ public class Producer {
         //create a Producer Record
         ProducerRecord<String, String> producerRecord =
                 new ProducerRecord<>("First_topic","Helloo");
+        ProducerRecord<String, String> prod =
+                new ProducerRecord<>("First_topic","Hi How are youuu");
+
 
         //send data
         producer.send(producerRecord);
+        producer.send(prod);
 
         //tell the producer to send all data and block until done -- synchronous
         producer.flush();

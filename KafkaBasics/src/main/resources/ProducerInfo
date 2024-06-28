@@ -24,7 +24,6 @@ Send the data
        }
       }
 
-
 2. Create producer properties (configuration of Producers):-
 
         Properties properties = new Properties();
@@ -85,7 +84,7 @@ In order to send the data to Kafka, we need to create a ProducerRecord.
         producer.send(producerRecord); ---- asynchronous
 
 
-6. Tell producer to send all data and clock until done:-
+6. Tell producer to send all data and block until done:-
         producer.flush(); ---- synchronous
 
 
@@ -99,3 +98,15 @@ Therefore, two additional functions, i.e., flush() and close() are required to e
 after the message is sent to Kafka.
 The flush() will force all the data that was in .send() to be produced and close() stops the producer.
 If these functions are not executed, the data will never be sent to Kafka as the main Java thread will exit before the data are flushed.
+
+
+   //Now we can check in consumer cli the value of First_topic produced by producer by executing below command after running the producer from intellij
+   bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic First_topic
+   Helloo
+
+   //When we run the producer.java class, it will print the info log log.info("hello world"); as [main] INFO Producer - hello world
+
+   //After creating new producer record it will give below output
+    YATRAONLINE\v-poorva.pasrija@codev-poorva:~/Downloads/kafka_2.13-3.7.0$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic First_topic
+    Helloo
+    Hi How are youuu
