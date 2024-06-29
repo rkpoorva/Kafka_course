@@ -17,7 +17,7 @@ public class ProducerWithCallback {
         properties.setProperty("key","value");
 
         //connecting to local host server//
-        properties.setProperty("bootstrap.server", "127.0.0.1:9092");
+        properties.setProperty("bootstrap.servers", "127.0.0.1:9092");
         //OR
         properties.setProperty("bootstrap.servers", "localhost:9092");
         //OR
