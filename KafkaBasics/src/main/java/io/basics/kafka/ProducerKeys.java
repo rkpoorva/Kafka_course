@@ -12,7 +12,7 @@ public class ProducerKeys {
     public static void main(String[] args) {
         log.info("Kafka producer with keys");
 
-        //create Producer properties//
+        //create Producer properties
         Properties properties = new Properties();
 
         //connecting to local host server//
@@ -51,6 +51,12 @@ public class ProducerKeys {
                         }
                     }
                 });
+            }
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 

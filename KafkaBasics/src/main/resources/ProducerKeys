@@ -1,0 +1,19 @@
+Kafka Producer: Java API with keys
+
+   Send messages with keys in kafka
+
+   send non-null keys to the kafka topic
+
+   same key = same partition
+
+   key is id we define and data with same key will always go to the same partition
+
+   key = truck_id ,
+   truck_id_123 will always go to partition 0
+   truck_id_345 will always go to partition 1
+
+   send some keys with values (topic, key and value)
+
+   we're going to produce multiple message with the same key and we'll see whether or not they end up in the same partition.
+
+  ==>After running the code, we will see same key goes to same partition

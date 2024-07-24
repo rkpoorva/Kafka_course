@@ -1,0 +1,65 @@
+Write a Basic Consumer to receive data from Kafka
+
+View basic configuration parameters
+
+Confirm we receive the data from the Kafka Producer
+
+Consumer ---> Broker using .poll(Duration timeout) method
+
+.poll method to get messages from the kafka broker and poll method will return data immediately if possible else will Return empty and wait for a timeout until it responds
+
+//Consumer configs:-
+we need to add key.deserializer - text divides and transform them into an actual object, so we need stringDeserializer
+
+properties.setProperty("group.id", groupId);
+properties.setProperty("auto.offset.reset", "earliest");
+//properties.setProperty("auto.offset.reset", "none/earliest/latest");
+  //none means if we dont have any existing consumer group, then we fail that means that we must set the consumer group before starting the application
+  //earliest means read from the beginning of the topic. this corresponds to the minus minus from beginning option when we looked at the kafka cli
+  // we will choose earliest cuz we wanna read entire history of our topic
+  //latest means " hey i want to read it from just now and only read the new messages sent from now
+
+//create consumer
+    KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+
+//subscribe to a topic
+    consumer.subscribe(Arrays.asList(topic)); //we can pass collection of topics
+
+//poll for data - consumers poll data from kafka
+     while(true){
+            log.info("polling");
+
+            ConsumerRecords<String,String> records = consumer.poll(Duration.ofMillis(1000));
+            //now we need to extract the consumer and the duration is how long we are willing to wait to receive data
+            //if kafka doesn't have any data, then we have to wait 1sec to receive data from kafka - with this we are not overloading the kafka
+            //this returns a collection of records
+
+            for(ConsumerRecord<String,String> record: records){
+                log.info("Key: " + record.key() + ", Value: " + record.value());
+                log.info("Partition: " + record.partition() + ", Value: " + record.value());
+            }
+        }
+
+------------------------------------------------------------------------------------------------------------------------------------
+//Graceful Shutdown
+Ensure we have code in place to respond to termination signals
+improve our java code :--
+} catch(WakeupException e){
+  log.info("Wake up exception!"); //we ignore this as this is an expected exception when closing a consumer
+} catch(Exception e){
+  log.error("unexpected exception", e);
+} finally{
+   consumer,close();
+   log.info("the consumer is now gracefully closed");
+}
+
+Okay, so let's summarize because this was a bit of improvement. So we are creating a reference to the main thread.
+We add a shutdown hook, we wake up the consumer in the shutdown hook, and then we join the main thread so that the code after the try gets run, then the consumer
+on that poll throws the wake up exception, which is saying, "Hey, the consumer is starting to shut down."
+We go into the final block, we close the consumer, which is going to gracefully close any connection to Kafka and allow our group to rebalance, gracefully.
+And this will also commit Offsets. And finally we will have a final message saying,"The consumer is now gracefully shut down."
+
+
+Kafka Consumer: Java API - Consumer Groups
+Look at the behaviour of our consumer as part of a consumer group.
+Observe partition rebalance mechanisms
